@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Creating Circles</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="400" height="450"></canvas>
+    <button id="resetButton">Reset</button>
+
+    <script>
+        // Get the canvas element
+        let canvas = document.getElementById("myCanvas");
+        let context = canvas.getContext("2d");
+
+        // Add click event listener to the reset button
+        let resetButton = document.getElementById("resetButton");
+        resetButton.addEventListener("click", resetApplication);
+
+        // Define the circle properties
+        let circle1 = { x: 50, y: 100, radius: 30, color: "red" };
+        let circle2 = { x: 50, y: 200, radius: 30, color: "blue" };
+        let circle3 = { x: 50, y: 300, radius: 30, color: "green" };
+        let circle4 = { x: 50, y: 400, radius: 30, color: "orange" };
+
+        // Define arrow properties
+        let arrowHeight = 10;
+        let arrowOffsetX = 20;
+
+        // Function to draw a circle
+        function drawCircle(x, y, radius, color) {
+            context.beginPath();
+            context.arc(x, y, radius, 0, 2 * Math.PI);
+            context.fillStyle = color;
+            context.fill();
+            context.closePath();
+        }
+
+        // Function to draw an arrow
+        function drawArrow(x, y) {
+            // context.clearRect(0, 0, canvas.width, canvas.height);
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x + arrowHeight, y - arrowHeight / 2);
+            context.lineTo(x + arrowHeight, y + arrowHeight / 2);
+            context.closePath();
+            context.fillStyle = "black";
+            context.fill();
+        }
+
+        // Function to move the arrow towards the circle
+        function moveArrow(circle) {
+            let arrowY = circle.y;
+            let targetX = circle.x - arrowHeight;
+            let dx = (targetX - arrowOffsetX) / 100; // Adjust the speed of arrow movement
+
+            let animation = setInterval(function () {
+                context.clearRect(0, arrowY - arrowHeight, canvas.width, arrowHeight);
+                drawArrow(arrowOffsetX, arrowY);
+
+                if (arrowOffsetX >= targetX) {
+                    clearInterval(animation);
+                    circle.color = "purple"; // Change the circle color to purple
+                    drawCircles(); // Redraw all the circles with updated colors
+                }
+
+                arrowOffsetX += dx;
+            }, 10);
+        }
+
+        // Function to draw all the circles with their respective colors
+        function drawCircles() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawCircle(circle1.x, circle1.y, circle1.radius, circle1.color);
+            drawCircle(circle2.x, circle2.y, circle2.radius, circle2.color);
+            drawCircle(circle3.x, circle3.y, circle3.radius, circle3.color);
+            drawCircle(circle4.x, circle4.y, circle4.radius, circle4.color);
+
+            // Redraw arrows after clearing the canvas
+            drawArrow(canvas.width - arrowOffsetX, circle1.y);
+            drawArrow(canvas.width - arrowOffsetX, circle2.y);
+            drawArrow(canvas.width - arrowOffsetX, circle3.y);
+            drawArrow(canvas.width - arrowOffsetX, circle4.y);
+        }
+
+        // Add click event listeners to the circles
+        canvas.addEventListener("click", function (event) {
+            let rect = canvas.getBoundingClientRect();
+            let clickX = event.clientX - rect.left;
+            let clickY = event.clientY - rect.top;
+
+            if (isInsideCircle(clickX, clickY, circle1)) {
+                moveArrow(circle1);
+            } else if (isInsideCircle(clickX, clickY, circle2)) {
+                moveArrow(circle2);
+            } else if (isInsideCircle(clickX, clickY, circle3)) {
+                moveArrow(circle3);
+            } else if (isInsideCircle(clickX, clickY, circle4)) {
+                moveArrow(circle4);
+            }
+        });
+
+        // Helper function to check if the click is inside a circle
+        function isInsideCircle(x, y, circle) {
+            let dx = x - circle.x;
+            let dy = y - circle.y;
+            return dx * dx + dy * dy <= circle.radius * circle.radius;
+        }
+
+        // Draw the circles initially
+        drawCircles();
+
+        // Reset the application to its initial state
+        function resetApplication() {
+            // Reset circle colors
+            circle1.color = "red";
+            circle2.color = "blue";
+            circle3.color = "green";
+            circle4.color = "orange";
+
+            // Reset arrow offset
+            arrowOffsetX = 20;
+
+            // Redraw circles and arrows
+            drawCircles();
+        }
+
+    </script>
+</body>
+
+</html>
